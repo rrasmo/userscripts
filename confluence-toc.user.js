@@ -38,7 +38,7 @@
       position: fixed;
       top: var(--tm-toc-top, 56px);
       right: 0;
-      width: 150px;
+      width: 10px;
       height: calc(100vh - var(--tm-toc-top, 56px));
       z-index: 99;
     }
