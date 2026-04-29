@@ -12,7 +12,7 @@
   'use strict';
 
   const SIDEBAR_WIDTH = 260;
-  const WIDE_BREAKPOINT = 1400;
+  const WIDE_BREAKPOINT = 2000;
 
   GM_addStyle(`
     /* Sidebar container - top is set dynamically via JS */
