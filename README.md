@@ -16,10 +16,13 @@ To update: re-open the script file and install again when you pull changes.
 
 ## Scripts
 
-| Script | Description | Runs on |
-|--------|-------------|--------|
-| **Confluence Sidebar TOC** | Right sidebar table of contents for Confluence pages. Shows headings, scroll spy, and works on wide and narrow screens. | `https://*.atlassian.net/wiki/*` |
-| **Jira Shortcuts** | **Cmd+Enter** to submit the Create Issue dialog; **Cmd+Opt+O** to open Notifications. | `https://*.atlassian.net/jira/*`, `https://*.atlassian.net/browse/*` |
-| **Jira Issue Fields Hover White** | Replaces the default gray hover background on issue field content with white. | `https://*.atlassian.net/jira/*`, `https://*.atlassian.net/browse/*` |
-| **Jira Project Favicon** | Changes the browser favicon to the current Jira project's icon. | `https://*.atlassian.net/jira/*`, `https://*.atlassian.net/browse/*` |
-| **Jira Hide Agents & Apps** | Hides the Agents and Apps sections on Jira work items. | `https://*.atlassian.net/jira/*`, `https://*.atlassian.net/browse/*` |
+
+| Script                            | Description                                                                                                             | Runs on                                                              |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| **Confluence Sidebar TOC**        | Right sidebar table of contents for Confluence pages. Shows headings, scroll spy, and works on wide and narrow screens. | `https://*.atlassian.net/wiki/`*                                     |
+| **Jira Shortcuts**                | **Cmd+Enter** to submit the Create Issue dialog; **Cmd+Opt+O** to open Notifications.                                   | `https://*.atlassian.net/jira/`*, `https://*.atlassian.net/browse/`* |
+| **Jira Issue Fields Hover White** | Replaces the default gray hover background on issue field content with white.                                           | `https://*.atlassian.net/jira/`*, `https://*.atlassian.net/browse/`* |
+| **Jira Project Favicon**          | Changes the browser favicon to the current Jira project's icon.                                                         | `https://*.atlassian.net/jira/`*, `https://*.atlassian.net/browse/`* |
+| **Jira Hide Agents & Apps**       | Hides the Agents and Apps sections on Jira work items.                                                                  | `https://*.atlassian.net/jira/`*, `https://*.atlassian.net/browse/`* |
+
+
