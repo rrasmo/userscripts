@@ -38,9 +38,7 @@
 
   function dismissToast(e) {
     if (e.key !== 'Escape' || !e.shiftKey) return false;
-    const dismissBtn = document.querySelector(
-      '[data-testid="platform.ui.flags.common.ui.common-flag-v2-dismiss"]'
-    );
+    const dismissBtn = document.querySelector('button[data-testid$="-dismiss"]');
     if (!dismissBtn) return false;
     console.log('Dismissing Toast');
     dismissBtn.click();
