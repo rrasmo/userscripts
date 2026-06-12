@@ -3,8 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0
 // @description  Cmd+Enter to submit Create Issue; Cmd+Opt+O to open Notifications; Shift+Esc to dismiss Toast
-// @match        https://*.atlassian.net/jira/*
-// @match        https://*.atlassian.net/browse/*
+// @match        https://*.atlassian.net/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=atlassian.com
 // @grant        none
 // ==/UserScript==
