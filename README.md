@@ -24,5 +24,6 @@ To update: re-open the script file and install again when you pull changes.
 | **Jira Issue Fields Hover White** | Replaces the default gray hover background on issue field content with white.                                           | `https://*.atlassian.net/jira/`*, `https://*.atlassian.net/browse/`* |
 | **Jira Project Favicon**          | Changes the browser favicon to the current Jira project's icon.                                                         | `https://*.atlassian.net/jira/`*, `https://*.atlassian.net/browse/`* |
 | **Jira Hide Agents & Apps**       | Hides the Agents and Apps sections on Jira work items.                                                                  | `https://*.atlassian.net/jira/`*, `https://*.atlassian.net/browse/`* |
+| **Google Calendar Highlight Weekends & Today** | Highlights weekends in light gray and today in light blue, across Day/Week/Month/Year/Schedule views. | `https://calendar.google.com/*`                                     |
 
 
