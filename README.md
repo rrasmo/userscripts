@@ -26,5 +26,6 @@ To update: re-open the script file and install again when you pull changes.
 | **Jira Hide Agents & Apps**       | Hides the Agents and Apps sections on Jira work items.                                                                  | `https://*.atlassian.net/jira/`*, `https://*.atlassian.net/browse/`* |
 | **Google Calendar Highlight Weekends & Today** | Highlights weekends in light gray and today in light blue, across Day/Week/Month/Year/Schedule views. | `https://calendar.google.com/*`                                     |
 | **W3Schools Next/Previous Shortcuts** | **D** to go to the Next page; **S** to go to the Previous page.                                          | `https://www.w3schools.com/*`                                       |
+| **Gmail Filter Shortcut**         | **T** to search all emails from the sender of the open message; **G P/O/U/F** to jump to the Promotions/Social/Updates/Forums inbox tabs. | `https://mail.google.com/*`                                          |
 
 
