@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Gmail Filter Shortcut
 // @namespace    http://tampermonkey.net/
-// @version      2.1
-// @description  Press 't' to search for all emails from the sender of the open email; 'g p/o/u/f' to jump to Promotions/Social/Updates/Forums (never in input fields)
+// @version      2.3
+// @description  Press 't' to search for all emails from the sender of the open email; 'g p/o/u/f' to jump to Promotions/Social/Updates/Forums; Cmd+U to click Unsubscribe on the open email; Cmd+. to toggle the left sidebar (never in input fields)
 // @match        https://mail.google.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mail.google.com
 // @grant        none
@@ -44,6 +44,40 @@
     const email = getSenderEmail();
     if (!email) return false;
     location.hash = `search/from%3A${encodeURIComponent(email)}`;
+    return true;
+  }
+
+  function findUnsubscribeButton() {
+    // The "Unsubscribe" pill sits in the message header next to the sender name;
+    // it's a leaf node (no child elements) so matching on trimmed text avoids
+    // also matching ancestor containers that happen to contain the same text.
+    const nodes = document.querySelectorAll('[role="main"] *');
+    for (const el of nodes) {
+      if (el.children.length) continue;
+      if ((el.textContent || '').trim().toLowerCase() !== 'unsubscribe') continue;
+      if (!isVisible(el)) continue;
+      return el.closest('[role="button"]') || el;
+    }
+    return null;
+  }
+
+  function clickUnsubscribe() {
+    const btn = findUnsubscribeButton();
+    if (!btn) return false;
+    simulateClick(btn);
+    return true;
+  }
+
+  function findMainMenuButton() {
+    // The hamburger icon that toggles the left sidebar has no visible text,
+    // just an aria-label, and that label doesn't change between open/closed states.
+    return document.querySelector('[aria-label="Main menu"]');
+  }
+
+  function toggleSidebar() {
+    const btn = findMainMenuButton();
+    if (!btn) return false;
+    simulateClick(btn);
     return true;
   }
 
@@ -124,8 +158,25 @@
   document.addEventListener(
     'keydown',
     (e) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (isTypingInEditable(e)) return;
+
+      if (e.metaKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === 'u') {
+        if (isMessageOpen() && clickUnsubscribe()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+
+      if (e.metaKey && !e.ctrlKey && !e.altKey && e.key === '.') {
+        if (toggleSidebar()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       if (awaitingCategoryKey) {
         const label = CATEGORY_LABELS[e.key.toLowerCase()];
