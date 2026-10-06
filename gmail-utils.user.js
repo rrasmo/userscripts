@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Gmail Filter Shortcut
+// @name         Gmail Utils
 // @namespace    http://tampermonkey.net/
-// @version      2.3
-// @description  Press 't' to search for all emails from the sender of the open email; 'g p/o/u/f' to jump to Promotions/Social/Updates/Forums; Cmd+U to click Unsubscribe on the open email; Cmd+. to toggle the left sidebar (never in input fields)
+// @version      3.0
+// @description  Press 't' to search for all emails from the sender of the open email; 'g p/o/u/f' to jump to Promotions/Social/Updates/Forums; Cmd+U to click Unsubscribe on the open email; Cmd+. to toggle the left sidebar; Shift+S to toggle split pane mode (never in input fields)
 // @match        https://mail.google.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mail.google.com
 // @grant        none
@@ -78,6 +78,15 @@
     const btn = findMainMenuButton();
     if (!btn) return false;
     simulateClick(btn);
+    return true;
+  }
+
+  function clickSplitPaneToggle() {
+    const el = document.querySelector(
+      '[aria-label="Toggle split pane mode"], [data-tooltip="Toggle split pane mode"]'
+    );
+    if (!el) return false;
+    simulateClick(el);
     return true;
   }
 
@@ -182,6 +191,14 @@
         const label = CATEGORY_LABELS[e.key.toLowerCase()];
         resetAwaitingCategoryKey();
         if (label && goToCategoryTab(label)) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+
+      if (e.key === 'S' && e.shiftKey) {
+        if (clickSplitPaneToggle()) {
           e.preventDefault();
           e.stopPropagation();
         }
