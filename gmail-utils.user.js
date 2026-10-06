@@ -2,7 +2,7 @@
 // @name         Gmail Utils
 // @namespace    http://tampermonkey.net/
 // @version      3.0
-// @description  Press 't' to search for all emails from the sender of the open email; 'g p/o/u/f' to jump to Promotions/Social/Updates/Forums; Cmd+U to click Unsubscribe on the open email; Cmd+. to toggle the left sidebar; Shift+S to toggle split pane mode (never in input fields)
+// @description  Press 't' to search for all emails from the sender of the open email; 'g p/o/u/f' to jump to Promotions/Social/Updates/Forums; Cmd+U to click Unsubscribe on the open email; Cmd+. to toggle the left sidebar; Shift+S to toggle split pane mode; 'gg' / Shift+G to open the first / last conversation in the list (never in input fields)
 // @match        https://mail.google.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mail.google.com
 // @grant        none
@@ -87,6 +87,17 @@
     );
     if (!el) return false;
     simulateClick(el);
+    return true;
+  }
+
+  function selectConversation(which) {
+    // Click the row's subject cell, like a mouse click: moves the list cursor and
+    // opens the conversation (in the reading pane when split pane mode is on).
+    const rows = [...document.querySelectorAll('[role="main"] tr.zA')].filter(isVisible);
+    if (!rows.length) return false;
+    const row = which === 'first' ? rows[0] : rows[rows.length - 1];
+    simulateClick(row.querySelector('td.a4W') || row);
+    row.scrollIntoView({ block: 'nearest' });
     return true;
   }
 
@@ -190,6 +201,11 @@
       if (awaitingCategoryKey) {
         const label = CATEGORY_LABELS[e.key.toLowerCase()];
         resetAwaitingCategoryKey();
+        if (e.key === 'g' && selectConversation('first')) {
+          e.preventDefault();
+          e.stopPropagation();
+          return;
+        }
         if (label && goToCategoryTab(label)) {
           e.preventDefault();
           e.stopPropagation();
@@ -197,8 +213,16 @@
         return;
       }
 
-      if (e.key === 'S' && e.shiftKey) {
+      if (e.code === 'KeyS' && e.shiftKey) {
         if (clickSplitPaneToggle()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        return;
+      }
+
+      if (e.code === 'KeyG' && e.shiftKey) {
+        if (selectConversation('last')) {
           e.preventDefault();
           e.stopPropagation();
         }
