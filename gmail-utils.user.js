@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Gmail Utils
 // @namespace    http://tampermonkey.net/
-// @version      3.0
-// @description  Press 't' to search for all emails from the sender of the open email; 'g p/o/u/f' to jump to Promotions/Social/Updates/Forums; Cmd+U to click Unsubscribe on the open email; Cmd+. to toggle the left sidebar; Shift+S to toggle split pane mode; 'gg' / Shift+G to open the first / last conversation in the list (never in input fields)
+// @version      3.1
+// @description  Press 't' to search for all emails from the sender of the open email; 'g p/o/u/f' to jump to Promotions/Social/Updates/Forums; Cmd+U to click Unsubscribe on the open email; Cmd+. to toggle the left sidebar; Shift+S to toggle split pane mode; 'i' to show details (from/to/date) of the open email; 'gg' / Shift+G to open the first / last conversation in the list (never in input fields)
 // @match        https://mail.google.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mail.google.com
 // @grant        none
@@ -63,6 +63,28 @@
 
   function clickUnsubscribe() {
     const btn = findUnsubscribeButton();
+    if (!btn) return false;
+    simulateClick(btn);
+    return true;
+  }
+
+  function findShowDetailsButton() {
+    // The small down arrow next to "to me" in each expanded message header.
+    const buttons = [...document.querySelectorAll('[role="main"] [aria-label="Show details"]')].filter(isVisible);
+    if (!buttons.length) return null;
+    // Prefer the message under Gmail's keyboard cursor (the blue bar): its outer
+    // div.h7 wrapper holds focus. Otherwise fall back to the most recently
+    // expanded message.
+    const focusedMessage = document.activeElement && document.activeElement.closest('[role="main"] .h7');
+    if (focusedMessage) {
+      const btn = buttons.find((b) => focusedMessage.contains(b));
+      if (btn) return btn;
+    }
+    return buttons[buttons.length - 1];
+  }
+
+  function clickShowDetails() {
+    const btn = findShowDetailsButton();
     if (!btn) return false;
     simulateClick(btn);
     return true;
@@ -232,6 +254,14 @@
       if (e.key === 'g' || e.key === 'G') {
         awaitingCategoryKey = true;
         awaitingCategoryTimer = setTimeout(resetAwaitingCategoryKey, 1000);
+        return;
+      }
+
+      if (e.key === 'i' && !e.shiftKey) {
+        if (isMessageOpen() && clickShowDetails()) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         return;
       }
 
