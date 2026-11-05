@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Google Calendar Highlight Weekends & Today
+// @name         Google Calendar Utils
 // @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  Highlights weekends in light gray and today in light blue across all Google Calendar views (Day, Week, Month, Year, mini calendar)
+// @version      2.0
+// @description  Highlights weekends in light gray and today in light blue across all Google Calendar views (Day, Week, Month, Year, mini calendar); 'f' / 'd' to go to the next / previous period (never in input fields)
 // @match        https://calendar.google.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=google.com
 // @grant        none
@@ -12,7 +12,7 @@
   'use strict';
 
   const DEBUG = false;
-  const LOG_PREFIX = '[GCal Highlight]';
+  const LOG_PREFIX = '[GCal Utils]';
 
   const log = (...args) => DEBUG && console.log(LOG_PREFIX, ...args);
 
@@ -141,4 +141,48 @@
 
   // Catch the midnight rollover for tabs left open overnight.
   setInterval(() => scheduleHighlight('interval'), 60 * 1000);
+
+  // --- Keyboard shortcuts ---
+
+  function isTypingInEditable(e) {
+    const target = e.target;
+    const tag = target.tagName && target.tagName.toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
+    if (target.isContentEditable) return true;
+    if (target.getAttribute && target.getAttribute('role') === 'textbox') return true;
+    return false;
+  }
+
+  // The top bar's arrow buttons have aria-labels like "Next week" / "Previous month"
+  // depending on the current view. The sidebar mini calendar has its own
+  // "Next month" / "Previous month" buttons, so look inside the top header first.
+  function clickPeriodButton(direction) {
+    const prefix = direction === 'next' ? 'Next' : 'Previous';
+    const selector = `button[aria-label^="${prefix}"]`;
+    const header = document.querySelector('header[role="banner"], header');
+    const btn = header?.querySelector(selector) || document.querySelector(selector);
+    if (!btn) {
+      log(`no "${prefix}" button found`);
+      return false;
+    }
+    btn.click();
+    return true;
+  }
+
+  const PERIOD_KEYS = { f: 'next', d: 'previous' };
+
+  document.addEventListener(
+    'keydown',
+    (e) => {
+      if (isTypingInEditable(e)) return;
+      if (e.ctrlKey || e.metaKey || e.altKey || e.shiftKey) return;
+      const direction = PERIOD_KEYS[e.key];
+      if (!direction) return;
+      if (clickPeriodButton(direction)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+    true
+  );
 })();
