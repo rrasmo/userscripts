@@ -27,5 +27,5 @@ To update: re-open the script file and install again when you pull changes.
 | **Google Calendar Utils** | Highlights weekends in light gray and today in light blue, across Day/Week/Month/Year/Schedule views; **F** / **D** to go to the next / previous period. | `https://calendar.google.com/*`                                     |
 | **W3Schools Next/Previous Shortcuts** | **D** to go to the Next page; **S** to go to the Previous page.                                          | `https://www.w3schools.com/*`                                       |
 | **Gmail Utils**                   | **T** to search all emails from the sender of the open message; **G P/O/U/F** to jump to the Promotions/Social/Updates/Forums inbox tabs; **Cmd+U** to click Unsubscribe on the open message; **Cmd+.** to toggle the left sidebar; **Shift+S** to toggle split pane mode; **G G** / **Shift+G** to open the first / last conversation in the list. | `https://mail.google.com/*`                                          |
-
+| **Google Utils**                  | **G** to show the top search bar (even when scrolled away), focus the search box and select its text for a quick new search. | `https://www.google.com/`, `https://www.google.com/search*`          |
 
