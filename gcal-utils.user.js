@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Google Calendar Utils
 // @namespace    http://tampermonkey.net/
-// @version      2.0
-// @description  Highlights weekends in light gray and today in light blue across all Google Calendar views (Day, Week, Month, Year, mini calendar); 'f' / 'd' to go to the next / previous period (never in input fields)
+// @version      2.1
+// @description  Highlights weekends in light gray and today in light blue across all Google Calendar views (Day, Week, Month, Year, mini calendar); marks office hours with gray dashed lines at 9:00 and 17:00 on weekdays in Day/Week/custom-day views; 'f' / 'd' to go to the next / previous period (never in input fields)
 // @match        https://calendar.google.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=google.com
 // @grant        none
@@ -110,10 +110,76 @@
     log(`data-grid-cell pass: ${cells.length} cell(s), ${matched} matched`);
   }
 
+  // --- Office hours markers ---
+  // Gray dashed horizontal lines at OFFICE_START and OFFICE_END across every weekday
+  // (Mon-Fri) column of the time grid (Day, Week and custom-day views). The grid is
+  // laid out in the primary timezone and each time-grid column spans exactly 24h, so
+  // hours map straight to a vertical offset (secondary timezones are only extra
+  // labels and don't affect this).
+  const OFFICE_START = 9;
+  const OFFICE_END = 17;
+  const OFFICE_CLASS = 'gcu-office-hours';
+  const OFFICE_LINE_STYLE = '1px dashed gray';
+  // Time-grid columns are tall (24h); all-day / header cells and Month view cells
+  // also carry data-datekey but are much shorter.
+  const MIN_TIME_COLUMN_HEIGHT = 480;
+  const NON_TIME_GRID_VIEW_RE = /\/r\/(month|year|agenda|schedule)/;
+
+  function findWeekdayTimeColumns() {
+    if (NON_TIME_GRID_VIEW_RE.test(location.pathname)) return [];
+    return Array.from(document.querySelectorAll('[data-datekey]')).filter((cell) => {
+      if (cell.offsetHeight < MIN_TIME_COLUMN_HEIGHT || cell.offsetWidth === 0) return false;
+      const d = decodeDateKey(cell.getAttribute('data-datekey'));
+      if (!d) return false;
+      const dow = new Date(d.year, d.month - 1, d.day).getDay();
+      return dow >= 1 && dow <= 5;
+    });
+  }
+
+  function markOfficeHours() {
+    const columns = new Set(findWeekdayTimeColumns());
+    document.querySelectorAll(`.${OFFICE_CLASS}`).forEach((el) => {
+      if (!columns.has(el.parentElement)) el.remove();
+    });
+
+    columns.forEach((column) => {
+      let lines = column.querySelectorAll(`:scope > .${OFFICE_CLASS}`);
+      if (lines.length !== 2) {
+        lines.forEach((el) => el.remove());
+        if (getComputedStyle(column).position === 'static') column.style.position = 'relative';
+        lines = [OFFICE_START, OFFICE_END].map(() => {
+          const line = document.createElement('div');
+          line.className = OFFICE_CLASS;
+          Object.assign(line.style, {
+            position: 'absolute',
+            left: '0px',
+            right: '0px',
+            height: '0px',
+            borderTop: OFFICE_LINE_STYLE,
+            pointerEvents: 'none',
+            zIndex: '5',
+          });
+          column.appendChild(line);
+          return line;
+        });
+      }
+
+      // Columns are 24 whole-pixel hours plus a 1px bottom gridline (e.g. 24 * 48 + 1),
+      // so derive the hour height in whole pixels rather than using percentages, which
+      // would drift off the hour gridlines by a fraction of a pixel. Recomputed on
+      // every pass so it follows zoom / density changes (style isn't observed, so no
+      // loop).
+      const hour = Math.floor(column.offsetHeight / 24);
+      lines[0].style.top = `${OFFICE_START * hour}px`;
+      lines[1].style.top = `${OFFICE_END * hour}px`;
+    });
+  }
+
   function highlight() {
     const today = new Date();
     highlightDateKeyCells(today);
     highlightGridCells();
+    markOfficeHours();
   }
 
   let scheduled = false;
